@@ -952,9 +952,17 @@ async function showDetails(id, vod_name, sourceCode) {
                         </button>
                         <span class="text-gray-400 text-sm">共 ${data.episodes.length} 集</span>
                     </div>
-                    <button onclick="copyLinks()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors">
-                        复制链接
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="playWithMpv()" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-colors">
+                            MPV播放
+                        </button>
+                        <button onclick="playWithInfuse()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded text-sm transition-colors">
+                            Infuse播放
+                        </button>
+                        <button onclick="copyLinks()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors">
+                            复制链接
+                        </button>
+                    </div>
                 </div>
                 <div id="episodesGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
                     ${renderEpisodes(vod_name, sourceCode, id)}
@@ -1107,6 +1115,56 @@ function copyLinks() {
     }).catch(err => {
         showToast('复制失败，请检查浏览器权限', 'error');
     });
+}
+
+// 使用mpv播放器播放当前视频
+function playWithMpv() {
+    // 获取当前选中的剧集索引
+    const currentIndex = currentEpisodeIndex || 0;
+    // 获取对应的播放链接
+    const currentUrl = currentEpisodes[currentIndex];
+    
+    if (!currentUrl) {
+        showToast('获取播放链接失败', 'error');
+        return;
+    }
+    
+    // 构建mpv协议链接
+    const mpvUrl = `mpv://${encodeURIComponent(currentUrl)}`;
+    
+    // 尝试打开mpv播放器
+    try {
+        window.open(mpvUrl, '_blank');
+        showToast('正在使用mpv播放器打开', 'success');
+    } catch (err) {
+        showToast('打开mpv播放器失败，请确认已安装mpv并配置了协议处理', 'error');
+        console.error('打开mpv失败:', err);
+    }
+}
+
+// 使用infuse播放器播放当前视频
+function playWithInfuse() {
+    // 获取当前选中的剧集索引
+    const currentIndex = currentEpisodeIndex || 0;
+    // 获取对应的播放链接
+    const currentUrl = currentEpisodes[currentIndex];
+    
+    if (!currentUrl) {
+        showToast('获取播放链接失败', 'error');
+        return;
+    }
+    
+    // 构建infuse协议链接
+    const infuseUrl = `infuse://x-callback-url/play?url=${encodeURIComponent(currentUrl)}`;
+    
+    // 尝试打开infuse播放器
+    try {
+        window.open(infuseUrl, '_blank');
+        showToast('正在使用Infuse播放器打开', 'success');
+    } catch (err) {
+        showToast('打开Infuse播放器失败，请确认已安装Infuse并配置了协议处理', 'error');
+        console.error('打开Infuse失败:', err);
+    }
 }
 
 // 切换排序状态的函数
